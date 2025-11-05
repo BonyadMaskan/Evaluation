@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>داشبورد پایش استان‌ها - بنیاد مسکن</title>
+ <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background-color: #f4f6f9;
+    }
+    .card{background:white;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(15,23,42,0.06);
+border-left: 5px solid #119b06;
+
+}
+
+    .muted{color:#64748b}
+    .kpi-num{font-weight:700;font-size:1.4rem}
+    .tag{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px}
+    .grid-provs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    @media (max-width:1024px){.grid-provs{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){.grid-provs{grid-template-columns:repeat(1,1fr)}}
+
+    /* اضافه: زیباسازی border با افکت و فاصله داخلی */
+    .province-card {
+border-left: 5px solid #0532b7;
+border-top: 5px solid #0532b7;
+      transition: box-shadow .18s ease, transform .12s ease, border-color .18s ease;
+    }
+    .province-card:hover {
+      box-shadow: 0 10px 28px rgba(2,6,23,0.08);
+      transform: translateY(-4px);
+      border-color: rgba(56,189,248,0.22); /* sky-400 tint */
+    }
+
+    /* کوچک کردن padding و متن نمودار مینی برای فشرده بودن */
+    .mini-chart-canvas { width:100% !important; height:60px !important; display:block; }
+    .proj-box { background: #fff; }
+  </style>
+</head>
+<body class="p-6">
+  <div class="max-w-7xl mx-auto">
+    <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">داشبورد پایش عملکرد استان‌ها — بنیاد مسکن</h1>
+        <p class="muted mt-1">تمرکز: ارزیابی استان‌ها بر اساس برنامه پنج‌ساله، بودجه و تعهدات بالادستی — نمایش پروژه‌های ملی</p>
+      </div>
+      <div class="flex gap-3 items-center">
+        <select id="period" class="card">
+          <option value="2025-q3">فصل ۳ - ۱۴۰۴</option>
+          <option value="2025-q2">فصل ۲ - ۱۴۰۴</option>
+          <option value="2024-q4">فصل ۴ - ۱۴۰۳</option>
+        </select>
+        <button id="refreshBtn" class="bg-sky-600 text-white px-4 py-2 rounded-md">بروزرسانی</button>
+      </div>
+    </header>
+
+    <!-- Top summary -->
+    <section class="grid grid-cols-12 gap-6 mb-6">
+      <div class="col-span-12 lg:col-span-8">
+        <div class="card">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-semibold">نمای کلی استان‌ها</h3>
+              <div class="muted text-sm">مجموع امتیاز میانگین، روند و وضعیت پروژه‌های ملی</div>
+            </div>
+            <div class="flex gap-3 items-center">
+              <div class="text-center">
+                <div class="muted text-sm">امتیاز میانگین کل</div>
+                <div class="kpi-num text-2xl text-sky-600" id="avgScore">--</div>
+              </div>
+              <div class="text-center">
+                <div class="muted text-sm">استان‌های در وضعیت هشدار</div>
+                <div class="kpi-num text-amber-600" id="warningCount">--</div>
+              </div>
+              <div class="text-center">
+                <div class="muted text-sm">استان‌های برتر</div>
+                <div class="kpi-num text-emerald-600" id="topCount">--</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-12 lg:col-span-8">
+              <canvas id="nationalProjectsChart" height="200"></canvas>
+            </div>
+            <div class="col-span-12 lg:col-span-4">
+              <div class="mb-3">
+                <div class="muted text-sm">شرح نمودار: هر استان برای هر پروژه به‌صورت ستونی نمایش داده شده و هر ستون به سه بخش (راهبردی، بودجه، تعهد) تقسیم شده است.</div>
+              </div>
+              <div class="mb-3 card">
+                <div class="text-sm muted">پروژه‌ها تحت پایش</div>
+                <ul class="mt-2 text-sm">
+                  <li>• نهضت ملی مسکن (پروژه ملی)</li>
+                  <li>• بازسازی و بهسازی مناطق آسیب‌دیده</li>
+                  <li>• عمران روستایی و طرح هادی</li>
+                  <li>• توسعه مسکن شهری و بهسازی بافت فرسوده</li>
+                </ul>
+              </div>
+              <div class="card">
+                <div class="text-sm muted">شاخص‌های کلیدی نمایش</div>
+                <ul class="mt-2 text-sm">
+                  <li>• درصد پیشرفت فیزیکی</li>
+                  <li>• درصد تحقق بودجه</li>
+                  <li>• درصد تحقق تعهدات بالادستی</li>
+                  <li>• میانگین تأخیر (روز)</li>
+                  <li>• ضریب رضایت ذی‌نفعان (نظرسنجی)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <aside class="col-span-12 lg:col-span-4">
+        <div class="card mb-4">
+          <h4 class="font-semibold mb-2">فیلترها</h4>
+          <div class="flex flex-col gap-2">
+            <label class="text-sm muted">انتخاب استان برای مشاهده جزئیات</label>
+            <select id="provinceSelect" class="w-full border rounded p-2">
+            </select>
+            <label class="text-sm muted">شاخص نمایشی</label>
+            <select id="metricSelect" class="w-full border rounded p-2">
+              <option value="composite">امتیاز ترکیبی</option>
+              <option value="strategic">عملکرد راهبردی</option>
+              <option value="budget">عملکرد بودجه‌ای</option>
+              <option value="commitment">عملکرد تعهدی</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 class="font-semibold mb-2">حسابرسی سریع</h4>
+          <div class="text-sm muted">۵ هشدار مهم اخیر</div>
+          <ol class="mt-2 text-sm space-y-1" id="quickAlerts"></ol>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Provinces grid detailed -->
+    <section class="mb-6">
+      <h2 class="text-xl font-semibold mb-3">ارزیابی تفصیلی استان‌ها</h2>
+      <div class="grid-provs" id="provinceCards"></div>
+    </section>
+
+    <!-- Detailed table and rankings -->
+    <section class="card">
+      <h3 class="text-lg font-semibold mb-3">جدول مقایسه‌ای کامل استان‌ها</h3>
+      <div class="overflow-auto">
+        <table class="w-full text-sm table-auto border-collapse">
+          <thead class="bg-slate-50 text-slate-700">
+            <tr>
+              <th class="p-2 text-right">استان</th>
+              <th class="p-2 text-right">امتیاز ترکیبی</th>
+              <th class="p-2 text-right">پیشرفت نهضت ملی مسکن (%)</th>
+              <th class="p-2 text-right">پیشرفت بازسازی (%)</th>
+              <th class="p-2 text-right">پیشرفت عمران روستایی (%)</th>
+              <th class="p-2 text-right">تحقق بودجه (%)</th>
+              <th class="p-2 text-right">تحقق تعهدات (%)</th>
+              <th class="p-2 text-right">میانگین تأخیر (روز)</th>
+              <th class="p-2 text-right">رضایت ذی‌نفعان (%)</th>
+            </tr>
+          </thead>
+          <tbody id="provinceTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="mt-6 muted text-sm">نمایش با داده‌های فرضی و ساختگی اما معقول برای نمونه پیاده‌سازی - مستند: پروپوزال اداره کل نظارت راهبردی</footer>
+  </div>
+
+  <script>
+  (function(){
+    // Provinces sample (7 representative provinces)
+    const provinces = [
+      {code:'TH', name:'تهران'},
+      {code:'KR', name:'خراسان رضوی'},
+      {code:'FS', name:'فارس'},
+      {code:'IS', name:'اصفهان'},
+      {code:'EA', name:'آذربایجان شرقی'},
+      {code:'SB', name:'سیستان و بلوچستان'},
+      {code:'KH', name:'خوزستان'}
+    ];
+
+    // National projects
+    const projects = ['نهضت ملی مسکن','بازسازی و بهسازی','عمران روستایی','توسعه مسکن شهری'];
+
+    // Generate plausible dummy metrics per province and project
+    const data = {};
+    provinces.forEach(p=>{
+      const projData = {};
+      projects.forEach(proj=>{
+        const base = proj==='نهضت ملی مسکن'? 60 : proj==='بازسازی و بهسازی'? 55 : proj==='عمران روستایی'? 65 : 58;
+        const strategic = Math.min(98, Math.max(35, Math.round(base + (Math.random()*20 - 6))));
+        const budget = Math.min(98, Math.max(30, Math.round(base + (Math.random()*18 - 8))));
+        const commitment = Math.min(98, Math.max(25, Math.round(base + (Math.random()*22 - 10))));
+        projData[proj] = {strategic, budget, commitment, progress: Math.round((strategic*0.4 + budget*0.4 + commitment*0.2))};
+      });
+      const totalScores = Object.values(projData).reduce((acc,p)=>acc + p.progress,0);
+      const composite = Math.round(totalScores / projects.length);
+      const avgDelay = Math.round( (Math.random()*60) );
+      const satisfaction = Math.round(50 + (composite-60)*0.4 + (Math.random()*12-6));
+      data[p.code] = { meta: p, projData, composite, avgDelay, satisfaction };
+    });
+
+    // Fill province select and quick alerts
+    const provinceSelect = document.getElementById('provinceSelect');
+    provinces.forEach(p=>{ const opt = document.createElement('option'); opt.value=p.code; opt.textContent=p.name; provinceSelect.appendChild(opt); });
+
+    const quickAlerts = [
+      'عدم تحقق نقدینگی کافی در ۳ استان برای پروژه‌های بازسازی',
+      'افزایش میانگین تأخیر به بیش از ۴۰ روز در برخی پروژه‌های جهادی',
+      'انحراف بودجه بیش از ۱۵٪ در بخشی از پروژه‌های استان‌های مرزی',
+      'پایین بودن رضایت ذی‌نفعان برای پروژه‌های بهسازی در دو استان',
+      'توصیه: تمرکز بر استان‌های دارای توان جذب بالا برای تخصیص فوری منابع'
+    ];
+    const qList = document.getElementById('quickAlerts'); quickAlerts.forEach(a=>{ const li=document.createElement('li'); li.textContent=a; qList.appendChild(li); });
+
+    // Populate province cards (detailed) WITH mini charts and border
+    const provinceCards = document.getElementById('provinceCards');
+
+    // keep reference to mini charts if needed later
+    const miniCharts = [];
+
+    Object.values(data).forEach((item, idx)=>{
+      const div = document.createElement('div');
+      // use both card and custom province-card class for look
+      div.className = 'card province-card p-4';
+      // build content container
+      div.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <div class="text-lg font-semibold">${item.meta.name}</div>
+            <div class="muted text-sm">امتیاز ترکیبی: <span class="font-bold text-sky-600">${item.composite}</span></div>
+          </div>
+          <div class="text-right">
+            <div class="muted text-xs">تاخیر میانگین</div>
+            <div class="font-semibold text-amber-600">${item.avgDelay} روز</div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="text-sm muted">رضایت ذی‌نفعان: <span class="font-semibold">${item.satisfaction}%</span></div>
+        </div>
+        <div class="text-sm muted mb-2">وضعیت پروژه‌های ملی (نزدیک به واقعیت)</div>
+        <div class="grid grid-cols-1 gap-3 proj-container" id="proj-${idx}"></div>
+        <div class="mt-3 text-sm muted">جزئیات: تعداد پروژه‌های فعال: ${Math.round(20 + Math.random()*80)}</div>
+      `;
+      provinceCards.appendChild(div);
+
+      // insert each project box with mini canvas
+      const projContainer = div.querySelector(`#proj-${idx}`);
+      projects.forEach((proj, j)=>{
+        const pd = item.projData[proj];
+        const chartId = `mini-chart-${idx}-${j}`;
+        const projBox = document.createElement('div');
+        projBox.className = "proj-box p-2 border border-slate-100 rounded-lg flex flex-col";
+        projBox.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="text-sm"><strong>${proj}</strong><div class="muted text-xs">پیشرفت ترکیبی: ${pd.progress}%</div></div>
+            <div class="flex gap-2 items-center text-xs muted">
+              <div>راهبردی: ${pd.strategic}%</div>
+              <div>بودجه: ${pd.budget}%</div>
+              <div>تعهد: ${pd.commitment}%</div>
+            </div>
+          </div>
+          <div class="mt-2">
+            <canvas id="${chartId}" class="mini-chart-canvas"></canvas>
+          </div>
+        `;
+        projContainer.appendChild(projBox);
+
+        // create mini chart (bar) for three metrics
+        // Use setTimeout 0 to ensure canvas is in DOM and has computed size (works reliably)
+        setTimeout(()=>{
+          const ctxMini = document.getElementById(chartId).getContext('2d');
+          // create minimal chart instance
+          const mini = new Chart(ctxMini, {
+            type: 'bar',
+            data: {
+              labels: ['راهبردی','بودجه','تعهد'],
+              datasets: [{
+                data: [pd.strategic, pd.budget, pd.commitment],
+                backgroundColor: [
+                  hexToRgba('#06b6d4',0.95),
+                  hexToRgba('#10b981',0.95),
+                  hexToRgba('#f59e0b',0.95)
+                ],
+                borderRadius: 6,
+                barThickness: 14
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false }, tooltip: { enabled: false } },
+              scales: {
+                x: { display: false, grid: { display: false } },
+                y: { display: false, beginAtZero:true, max:100, grid: { display: false } }
+              }
+            }
+          });
+          miniCharts.push(mini);
+        }, 0);
+      });
+    });
+
+    // Table body
+    const tBody = document.getElementById('provinceTableBody');
+    Object.values(data).forEach(item=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="p-2 text-right">${item.meta.name}</td>
+        <td class="p-2 text-right font-semibold">${item.composite}</td>
+        <td class="p-2 text-right">${item.projData['نهضت ملی مسکن'].progress}</td>
+        <td class="p-2 text-right">${item.projData['بازسازی و بهسازی'].progress}</td>
+        <td class="p-2 text-right">${item.projData['عمران روستایی'].progress}</td>
+        <td class="p-2 text-right">${Math.round((item.projData['نهضت ملی مسکن'].budget + item.projData['بازسازی و بهسازی'].budget + item.projData['عمران روستایی'].budget + item.projData['توسعه مسکن شهری'].budget)/4)}</td>
+        <td class="p-2 text-right">${Math.round((item.projData['نهضت ملی مسکن'].commitment + item.projData['بازسازی و بهسازی'].commitment + item.projData['عمران روستایی'].commitment + item.projData['توسعه مسکن شهری'].commitment)/4)}</td>
+        <td class="p-2 text-right">${item.avgDelay}</td>
+        <td class="p-2 text-right">${item.satisfaction}</td>
+      `;
+      tBody.appendChild(tr);
+    });
+
+    // Compute aggregates
+    const composites = Object.values(data).map(d=>d.composite);
+    const avgComposite = Math.round(composites.reduce((a,b)=>a+b,0)/composites.length);
+    const warnings = Object.values(data).filter(d=>d.composite < 60).length;
+    const tops = Object.values(data).filter(d=>d.composite >= 80).length;
+    document.getElementById('avgScore').textContent = avgComposite;
+    document.getElementById('warningCount').textContent = warnings;
+    document.getElementById('topCount').textContent = tops;
+
+    // Prepare chart datasets: for each project create three datasets (strategic,budget,commitment) with stack=project
+    const provinceLabels = provinces.map(p=>p.name);
+    const datasets = [];
+    const colors = { strategic:'#06b6d4', budget:'#10b981', commitment:'#f59e0b' };
+    projects.forEach(proj=>{
+      const stratData = provinces.map(p=> data[p.code].projData[proj].strategic);
+      const budData = provinces.map(p=> data[p.code].projData[proj].budget);
+      const comData = provinces.map(p=> data[p.code].projData[proj].commitment);
+      datasets.push({ label: proj + ' - راهبردی', data: stratData, backgroundColor: hexToRgba(colors.strategic,0.9), stack: proj });
+      datasets.push({ label: proj + ' - بودجه', data: budData, backgroundColor: hexToRgba(colors.budget,0.9), stack: proj });
+      datasets.push({ label: proj + ' - تعهد', data: comData, backgroundColor: hexToRgba(colors.commitment,0.9), stack: proj });
+    });
+
+    // Create stacked grouped bar chart
+    const ctx = document.getElementById('nationalProjectsChart').getContext('2d');
+    const nationalChart = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: provinceLabels, datasets: datasets },
+      options: {
+        responsive:true, interaction:{mode:'index', intersect:false},
+        plugins:{legend:{position:'top'}, tooltip:{enabled:true}},
+        scales: {
+          x: { stacked: true },
+          y: { stacked: false, beginAtZero:true, max: 100, title:{display:true, text:'درصد/شاخص'} }
+        }
+      }
+    });
+
+    function hexToRgba(hex, alpha){
+      var h = hex.replace('#',''); var bigint = parseInt(h,16); var r=(bigint>>16)&255; var g=(bigint>>8)&255; var b=bigint&255; return 'rgba('+r+','+g+','+b+','+alpha+')';
+    }
+
+    // Refresh button: regenerate small random variations (reload)
+    document.getElementById('refreshBtn').addEventListener('click', function(){ location.reload(); });
+
+    // Province select change -> scroll to card
+    provinceSelect.addEventListener('change', function(){
+      const code = this.value;
+      const allCards = Array.from(document.querySelectorAll('#provinceCards .province-card'));
+      const target = allCards.find(c=> c.querySelector('.text-lg').textContent.trim() === data[code].meta.name);
+      if(target){
+        target.scrollIntoView({behavior:'smooth', block:'center'});
+        // outline highlight
+        const prev = document.querySelector('.province-card[aria-selected="true"]');
+        if(prev){ prev.removeAttribute('aria-selected'); prev.style.boxShadow=''; }
+        target.setAttribute('aria-selected','true');
+        target.style.boxShadow = '0 12px 38px rgba(2,6,23,0.08)';
+        setTimeout(()=>{ if(target.getAttribute('aria-selected')){ target.removeAttribute('aria-selected'); target.style.boxShadow=''; } }, 2200);
+      }
+    });
+
+    // initial selection
+    provinceSelect.value = provinces[0].code;
+
+  })();
+  </script>
+</body>
+</html>
