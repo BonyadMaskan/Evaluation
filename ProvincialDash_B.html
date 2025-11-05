@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🏆 داشبورد عملکرد استان‌ها - ریاست بنیاد مسکن</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Vazirmatn', Tahoma, sans-serif;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      color: #0f172a;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.25);
+      transform: translateY(-3px);
+    }
+
+    .chart-container { position: relative; height: 350px; }
+    .chart-container-small { position: relative; height: 280px; }
+
+    .progress-bar-container {
+      background: #e2e8f0;
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    @media (max-width:1024px) {
+      .grid-provs { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width:640px) {
+      .grid-provs { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="p-6">
+
+  <div class="max-w-7xl mx-auto space-y-8">
+    <!-- Header -->
+    <header class="bg-gradient-to-l from-sky-700 to-sky-500 text-white p-6 rounded-2xl shadow-lg flex flex-col sm:flex-row justify-between items-center gap-6">
+      <div class="flex items-center gap-4">
+        <div class="bg-white/20 p-3 rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h6v6h5V9H4v8h5z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-2xl font-extrabold">داشبورد عملکرد استان‌ها</h1>
+          <p class="text-sky-100 text-sm mt-1">پایش پروژه‌های بنیاد مسکن در سراسر کشور — ویژه ریاست</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <select id="period" class="bg-white text-slate-800 px-4 py-2 rounded-lg border border-sky-600 focus:ring-2 focus:ring-sky-300">
+          <option>فصل سوم ۱۴۰۴</option>
+          <option>فصل دوم ۱۴۰۴</option>
+        </select>
+        <button id="refreshBtn" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg font-bold transition">🔄 بازخوانی</button>
+      </div>
+    </header>
+
+    <!-- KPI Cards -->
+    <section class="grid grid-cols-12 gap-6">
+      <div class="col-span-12 lg:col-span-8 grid grid-cols-3 gap-6">
+        <div class="card text-center">
+          <div class="text-4xl mb-2 text-sky-600">🌍</div>
+          <div class="text-sm text-slate-500">میانگین عملکرد کشور</div>
+          <div id="avgScore" class="text-3xl font-extrabold text-sky-700">--</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-4xl mb-2 text-amber-600">⚠️</div>
+          <div class="text-sm text-slate-500">استان‌های با وضعیت هشدار</div>
+          <div id="warningCount" class="text-3xl font-extrabold text-amber-700">--</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-4xl mb-2 text-emerald-600">🥇</div>
+          <div class="text-sm text-slate-500">استان‌های برتر</div>
+          <div id="topCount" class="text-3xl font-extrabold text-emerald-700">--</div>
+        </div>
+      </div>
+
+      <aside class="col-span-12 lg:col-span-4 card">
+        <h4 class="font-bold text-lg mb-3 text-red-600 flex items-center gap-2">🚨 هشدارهای کلیدی</h4>
+        <ol id="quickAlerts" class="text-sm space-y-2 list-disc pr-5"></ol>
+      </aside>
+    </section>
+
+    <!-- Charts -->
+    <section class="grid grid-cols-12 gap-6">
+      <div class="col-span-12 lg:col-span-7 card">
+        <h3 class="font-bold text-xl mb-3 text-slate-800">مقایسه عملکرد پروژه‌ها</h3>
+        <select id="projectSelect" class="border rounded-lg p-2 mb-3 text-sm">
+          <option>نهضت ملی مسکن</option>
+          <option>بازسازی و بهسازی</option>
+          <option>عمران روستایی</option>
+          <option>توسعه مسکن شهری</option>
+        </select>
+        <div class="chart-container">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <div class="col-span-12 lg:col-span-5 card">
+        <h3 class="font-bold text-xl mb-3 text-slate-800">روند تأخیر پروژه‌ها</h3>
+        <div class="chart-container-small">
+          <canvas id="delayChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Province Cards -->
+    <section>
+      <h2 class="text-xl font-bold mb-4 text-slate-800">📦 ارزیابی تفصیلی استان‌ها</h2>
+      <div id="provinceCards" class="grid grid-cols-3 gap-6 grid-provs"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-slate-500 border-t pt-4 text-xs">
+      طراحی و پیاده‌سازی: سازمان توسعه مسکن ایران — ۱۴۰۴
+    </footer>
+  </div>
+
+  <script>
+    Chart.register(ChartDataLabels);
+
+    const chartColors = ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+    const provinces = ['تهران', 'خراسان رضوی', 'فارس', 'اصفهان', 'آذربایجان شرقی', 'سیستان و بلوچستان', 'خوزستان', 'البرز', 'مازندران', 'کرمانشاه'];
+
+    // --- Fake Data Generator ---
+    const randomData = provinces.map(p => ({
+      name: p,
+      score: Math.floor(Math.random() * 30) + 60,
+      delay: Math.floor(Math.random() * 40) + 10
+    }));
+
+    // KPI
+    document.getElementById('avgScore').textContent = Math.round(randomData.reduce((a,b)=>a+b.score,0)/randomData.length);
+    document.getElementById('warningCount').textContent = randomData.filter(x=>x.score<65).length;
+    document.getElementById('topCount').textContent = randomData.filter(x=>x.score>80).length;
+
+    // Alerts
+    const alerts = [
+      'استان خوزستان با بیشترین تأخیر در پروژه‌های بازسازی.',
+      'استان فارس نیازمند بازبینی در روند تأمین مصالح.',
+      'استان البرز دارای رضایت ذی‌نفعان کمتر از میانگین.',
+      'استان تهران پیشتاز در توسعه شهری.',
+      'میانگین تأخیر کشور کمتر از ۳۰ روز است.'
+    ];
+    alerts.forEach(a=>{
+      const li=document.createElement('li');
+      li.innerHTML=a;
+      document.getElementById('quickAlerts').appendChild(li);
+    });
+
+    // --- Bar Chart ---
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    const barChart = new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels: provinces,
+        datasets: [{
+          label: 'درصد پیشرفت پروژه',
+          data: randomData.map(d=>d.score),
+          backgroundColor: chartColors.map(c=>c+'AA'),
+          borderColor: chartColors,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { display: false },
+          datalabels: { color: '#334155', anchor: 'end', align: 'top', font: { weight: 'bold' }, formatter: v => v+'%' }
+        },
+        scales: {
+          y: { beginAtZero: true, max: 100 }
+        }
+      }
+    });
+
+    // --- Delay Line Chart ---
+    const delayCtx = document.getElementById('delayChart').getContext('2d');
+    const delayChart = new Chart(delayCtx, {
+      type: 'line',
+      data: {
+        labels: provinces,
+        datasets: [{
+          label: 'میانگین تأخیر (روز)',
+          data: randomData.map(d=>d.delay),
+          fill: true,
+          backgroundColor: 'rgba(239,68,68,0.1)',
+          borderColor: '#ef4444',
+          tension: 0.3,
+          pointRadius: 5,
+          pointBackgroundColor: '#ef4444'
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'روز' } },
+          x: { title: { display: true, text: 'استان‌ها' } }
+        }
+      }
+    });
+
+    // --- Province Cards ---
+    const container = document.getElementById('provinceCards');
+    randomData.forEach(d=>{
+      const div=document.createElement('div');
+      div.className='card border-l-4 ' + (d.score>80?'border-emerald-500':d.score>65?'border-amber-400':'border-red-500');
+      div.innerHTML=`
+        <h3 class="font-bold text-lg mb-2 text-sky-800">${d.name}</h3>
+        <div class="flex justify-between text-sm mb-2">
+          <span>امتیاز کل:</span>
+          <span class="font-bold">${d.score}</span>
+        </div>
+        <div class="progress-bar-container mb-2">
+          <div class="progress-bar ${d.score>80?'bg-emerald-500':d.score>65?'bg-amber-400':'bg-red-500'}" style="width:${d.score}%"></div>
+        </div>
+        <div class="text-xs text-slate-500">میانگین تأخیر: <b>${d.delay}</b> روز</div>
+      `;
+      container.appendChild(div);
+    });
+  </script>
+</body>
+</html>
