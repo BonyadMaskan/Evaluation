@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد هوشمند نظارت راهبردی - ریاست بنیاد مسکن</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* متغیرهای اصلی CSS */
+        :root {
+            --primary-blue: #004a8f; /* آبی سازمانی */
+            --accent-orange: #f9a03f; /* نارنجی/طلایی سازمانی */
+            --bg-color: #f7f9fc; /* پس‌زمینه ملایم */
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 12px 25px rgba(0, 0, 0, 0.18);
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: #333;
+            margin: 0;
+            padding: 40px;
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 74, 143, 0.1);
+	border-bottom: 6px solid #4db705;
+        border-left: 6px solid #4db705;
+        background: #ecec9f;
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            font-size: 38px;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            color: #6c757d;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .section-title {
+            color: var(--primary-blue);
+            margin-top: 50px;
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: 700;
+            border-right: 6px solid var(--accent-orange);
+            padding-right: 15px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+        
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .button-card {
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-align: right;
+            min-height: 150px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+	 background: #ffffe9;
+        }
+
+        .button-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .icon {
+            font-size: 36px;
+            margin-left: 15px;
+            color: var(--primary-blue);
+        }
+
+        .card-title {
+            color: var(--primary-blue);
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .button-text {
+            font-size: 14px;
+            font-weight: 400;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        /* استایل‌های خاص برای تفکیک عملیاتی و ستادی و AI */
+        .operational-focus { border-left: 6px solid #10b981; /* سبز عملیاتی */ }
+        .staff-focus { border-left: 6px solid #6366f1; /* بنفش/آبی ستادی */ }
+        .ai-focus { border-left: 6px solid #f9a03f; /* نارنجی AI */ }
+        .action-focus { border-left: 6px solid #ef4444; /* قرمز اقدام */ }
+        .manager-focus { border-left: 6px solid #5a5a5a; /* خاکستری مدیریت */ }
+
+        /* رنگ‌بندی تفصیلی برای وزن‌ها */
+        .weight-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: white;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        }
+        .bg-budget { background-color: #d97706; }
+        .bg-strategic { background-color: #1d4ed8; }
+        .bg-commitment { background-color: #e0ddff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1> 📈 داشبورد هوشمند ارزیابی عملکرد و نظارت راهبردی</h1>
+        <h2>تجزیه و تحلیل داده‌ محور عملکرد واحدهای عملیاتی و ستادی و شرکت‌ها</h2>
+    </header>
+    
+    <div class="section-title">۱. داشبورد جامع شاخص‌های عملکرد (KPIs) - پایش تفکیکی</div>
+    <div class="grid-3">
+        <a href="#kpi-provinces" class="button-card operational-focus">
+            <div class="card-header">
+                <span class="icon" style="color: #10b981;">📍</span>
+                <span class="card-title">نمایش عملکرد استان‌ها</span>
+            </div>
+            <span class="button-text">مشاهده Scorecard و وضعیت عملکرد تمام ۳۱ استان بر اساس شاخص‌های عملیاتی مسکن و عمرانی.</span>
+        </a>
+        
+        <a href="#kpi-subsidiaries" class="button-card operational-focus">
+            <div class="card-header">
+                <span class="icon" style="color: #10b981;">🏭</span>
+                <span class="card-title">نمایش عملکرد شرکت‌های تابعه</span>
+            </div>
+            <span class="button-text">پایش عملکرد شرکت‌ها بر اساس شاخص‌های تولید، بازدهی، سودآوری و خدمات پشتیبانی.</span>
+        </a>
+        
+        <a href="#kpi-staff" class="button-card staff-focus">
+            <div class="card-header">
+                <span class="icon" style="color: #6366f1;">💼</span>
+                <span class="card-title">نمایش عملکرد معاونت‌های ستادی</span>
+            </div>
+            <span class="button-text">سنجش کارایی معاونت‌ها در ابلاغ سیاست‌ها، برنامه‌ریزی، پشتیبانی و نظارت ستادی.</span>
+        </a>
+    </div>
+
+    <div class="section-title">۲. تحلیل تفصیلی عملکرد بر اساس وزن‌دهی ۳ گانه ارزیابی</div>
+    <div class="grid-3">
+        <a href="#analysis-budget" class="button-card" style="border-left: 6px solid #d97706;">
+            <span class="weight-badge bg-budget">۴۰٪ وزن</span>
+            <div class="card-header">
+                <span class="icon" style="color: #d97706;">💰</span>
+                <span class="card-title">عملکرد بودجه‌ای و مالی</span>
+            </div>
+            <span class="button-text">گزارش انحراف از بودجه مصوب، کارایی هزینه‌ها، وصولی‌ها و مدیریت دارایی‌ها.</span>
+        </a>
+        
+        <a href="#analysis-strategic" class="button-card" style="border-left: 6px solid #1d4ed8;">
+            <span class="weight-badge bg-strategic">۴۰٪ وزن</span>
+            <div class="card-header">
+                <span class="icon" style="color: #1d4ed8;">🎯</span>
+                <span class="card-title">تحقق برنامه‌های راهبردی</span>
+            </div>
+            <span class="button-text">پیشرفت اهداف سند ۵ ساله، اجرای طرح‌های کلان و سنجش اثربخشی سیاست‌های ابلاغی.</span>
+        </a>
+        
+        <a href="#analysis-commitment" class="button-card" style="border-left: 6px solid #7c3aed;">
+            <span class="weight-badge bg-commitment">۲۰٪ وزن</span>
+            <div class="card-header">
+                <span class="icon" style="color: #7c3aed;">⚖️</span>
+                <span class="card-title">اجرای تعهدات و الزامات بیرونی</span>
+            </div>
+            <span class="button-text">میزان پاسخگویی و اجرای به‌موقع مصوبات مجلس، دولت و تفاهم‌نامه‌های وزارت راه.</span>
+        </a>
+    </div>
+    
+    <div class="section-title">۳. ابزارهای هوشمند تصمیم‌گیری و اقدامات راهبردی</div>
+    <div class="grid-4">
+        <a href="#ai-analysis" class="button-card ai-focus">
+            <div class="card-header">
+                <span class="icon" style="color: var(--accent-orange);">🧠</span>
+                <span class="card-title">AI - تحلیل با هوش مصنوعی</span>
+            </div>
+            <span class="button-text">پیش‌بینی روند عملکرد (Forecasting)، تشخیص ناهنجاری‌ها (Anomaly Detection) و ارائه سناریوهای بهینه‌سازی منابع.</span>
+        </a>
+
+        <a href="#deviation-analysis" class="button-card action-focus">
+            <div class="card-header">
+                <span class="icon" style="color: #ef4444;">📉</span>
+                <span class="card-title">تحلیل انحراف عملکرد</span>
+            </div>
+            <span class="button-text">شناسایی و ریشه‌یابی اختلاف عملکرد واحدها با اهداف و بودجه‌های تعیین شده (Variance Analysis).</span>
+        </a>
+        
+        <a href="#corrective-action" class="button-card action-focus">
+            <div class="card-header">
+                <span class="icon" style="color: #ef4444;">✉️</span>
+                <span class="card-title">ابلاغ دستورات اصلاحی و سیاست‌گذاری</span>
+            </div>
+            <span class="button-text">دسترسی مستقیم به فرآیند ابلاغ رسمی مصوبات و الزامات مدیریتی به واحدهای زیرمجموعه.</span>
+        </a>
+        
+        <a href="#archived-reports" class="button-card action-focus">
+            <div class="card-header">
+                <span class="icon" style="color: #ef4444;">🗄️</span>
+                <span class="card-title">آرشیو گزارش‌های دوره‌ای و سوابق</span>
+            </div>
+            <span class="button-text">دسترسی به گزارش‌های فصلی و سالانه پیشین جهت تحلیل روند عملکرد کلان بنیاد.</span>
+        </a>
+    </div>
+
+    <div class="section-title">۴. نظام ارزیابی مدیران (مدیریت منابع انسانی راهبردی)</div>
+    <div class="grid-3">
+        <a href="#eval-staff-managers" class="button-card manager-focus">
+            <div class="card-header">
+                <span class="icon" style="color: #5a5a5a;">👥</span>
+                <span class="card-title">ارزیابی مدیران ستادی (معاونت‌ها)</span>
+            </div>
+            <span class="button-text">سنجش مدیران معاونت‌ها و واحدهای ستادی بر اساس شاخص‌های نظارتی و سیاست‌گذاری.</span>
+        </a>
+        
+        <a href="#eval-province-managers" class="button-card manager-focus">
+            <div class="card-header">
+                <span class="icon" style="color: #5a5a5a;">🧑‍💼</span>
+                <span class="card-title">ارزیابی مدیران کل استان‌ها</span>
+            </div>
+            <span class="button-text">سنجش مدیران کل استان‌ها بر اساس نتایج عملیاتی، عملکرد مالی و میزان تحقق تعهدات منطقه‌ای.</span>
+        </a>
+        
+        <a href="#eval-company-managers" class="button-card manager-focus">
+            <div class="card-header">
+                <span class="icon" style="color: #5a5a5a;">📈</span>
+                <span class="card-title">ارزیابی مدیرعامل و هیئت مدیره شرکت‌ها</span>
+            </div>
+            <span class="button-text">سنجش رهبران شرکت‌های تابعه بر اساس شاخص‌های اقتصادی، بازدهی و کارایی در بازار.</span>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>
