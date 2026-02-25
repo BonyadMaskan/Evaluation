@@ -1,0 +1,1021 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>گزارش عملکرد استان‌ها - </title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+  <style>
+    :root{
+      --bg:#f6f8ff;
+      --card:#ffffff;
+      --muted:#55657a;
+      --text:#0b1220;
+      --line:rgba(16,24,40,.10);
+
+      --a1:#6d28d9;
+      --a2:#2563eb;
+      --a3:#06b6d4;
+
+      --good:#16a34a;
+      --warn:#d97706;
+      --bad:#e11d48;
+
+      --shadow: 0 14px 34px rgba(16,24,40,.10);
+      --shadow2: 0 10px 24px rgba(16,24,40,.08);
+      --shadowHover: 0 18px 50px rgba(16,24,40,.14);
+
+      --radius:22px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Vazirmatn", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      line-height:1.75;
+      background:
+        radial-gradient(1100px 700px at 15% 5%, rgba(37,99,235,.18), transparent 58%),
+        radial-gradient(900px 600px at 85% 10%, rgba(109,40,217,.14), transparent 55%),
+        radial-gradient(900px 700px at 55% 95%, rgba(6,182,212,.10), transparent 60%),
+        var(--bg);
+    }
+
+    .container{
+      width:100%;
+      max-width:none;
+      margin:0;
+      padding:18px 22px 64px;
+    }
+    @media (max-width: 900px){
+      .container{padding:14px 12px 50px}
+    }
+
+    /* ===== Banner ===== */
+    .banner{
+      position:relative;
+      border-radius:28px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.22);
+      box-shadow: var(--shadow);
+      padding:16px 18px;
+      color:#fff;
+      background:
+        radial-gradient(1200px 520px at 10% 10%, rgba(6,182,212,.40), transparent 60%),
+        radial-gradient(900px 520px at 85% 20%, rgba(109,40,217,.45), transparent 60%),
+        linear-gradient(135deg, #0b1220 0%, #0f1b35 55%, #0b1220 100%);
+    }
+    .banner::after{
+      content:"";
+      position:absolute;
+      inset:-140px -200px auto auto;
+      width:520px; height:520px;
+      border-radius:50%;
+      background: conic-gradient(from 180deg, rgba(109,40,217,.62), rgba(37,99,235,.62), rgba(6,182,212,.62), rgba(34,197,94,.40));
+      opacity:.48;
+      transform: rotate(-12deg);
+      pointer-events:none;
+      filter: blur(.2px);
+    }
+    .bannerTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      position:relative;
+      z-index:1;
+    }
+    .bannerTitle{display:flex; flex-direction:column; gap:6px; min-width:0;}
+    .bannerTitle h1{
+      margin:0;
+      font-size:25px;
+      font-weight:900;
+      letter-spacing:-.2px;
+      text-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .bannerTitle .subtitle{color:rgba(255,255,255,.82); font-size:15px; max-width:980px;}
+
+    .statusRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+      margin-top:2px;
+    }
+    .statusBtn{
+      border:1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.10);
+      color:#fff;
+      padding:9px 12px;
+      border-radius:14px;
+      font-weight:900;
+      font-size:15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 20px rgba(0,0,0,.18);
+      white-space:nowrap;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .dot{width:9px;height:9px;border-radius:50%}
+    .dot.good{background:var(--good)}
+    .dot.warn{background:var(--warn)}
+    .dot.bad{background:var(--bad)}
+    @media (max-width: 980px){
+      .bannerTop{flex-direction:column; align-items:flex-start}
+      .statusRow{justify-content:flex-start}
+    }
+
+    /* ===== Cards (more vivid & varied) ===== */
+    .card{
+      background: rgba(255,255,255,.95);
+      border:1px solid rgba(16,24,40,.10);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow2);
+      padding:16px 16px;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background:
+        radial-gradient(650px 240px at 18% 0%, rgba(37,99,235,.12), transparent 55%),
+        radial-gradient(520px 240px at 88% 10%, rgba(109,40,217,.10), transparent 55%),
+        radial-gradient(520px 240px at 55% 115%, rgba(6,182,212,.08), transparent 60%);
+      pointer-events:none;
+      opacity:.95;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      box-shadow: var(--shadowHover);
+      border-color: rgba(37,99,235,.18);
+    }
+    .cardHeader{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      position:relative; z-index:1;
+      margin-bottom:10px;
+    }
+    .card h2{
+      margin:0;
+      font-size:20px;
+      color: green;
+      font-weight:bold;
+      display:flex; align-items:center; gap:10px;
+    }
+    .hint{color:var(--muted); font-size:15px; position:relative; z-index:1}
+    .hr{height:1px; background: rgba(16,24,40,.10); margin:12px 0; position:relative; z-index:1}
+
+    /* Accent borders (varied) */
+    .accent{
+      border-right: 5px solid transparent;
+    }
+    .accent.purple{border-right-color: rgba(109,40,217,.85)}
+    .accent.blue{border-right-color: rgba(37,99,235,.85)}
+    .accent.cyan{border-right-color: rgba(6,182,212,.85)}
+    .accent.green{border-right-color: rgba(34,197,94,.85)}
+    .accent.amber{border-right-color: rgba(245,158,11,.88)}
+    .accent.rose{border-right-color: rgba(244,63,94,.85)}
+
+    /* Small sparkle for cards */
+    .spark{
+      position:absolute;
+      inset:auto -80px -90px auto;
+      width:240px; height:240px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.0) 62%);
+      opacity:.55;
+      filter: blur(1px);
+      pointer-events:none;
+      z-index:0;
+      transform: rotate(12deg);
+    }
+
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+      margin-top:10px;
+      position:relative; z-index:1;
+    }
+    @media (max-width: 980px){ .kpis{grid-template-columns: repeat(2, 1fr)} }
+    .kpi{
+      padding:12px 12px;
+      border-radius:18px;
+      border:1px solid rgba(16,24,40,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(248,250,255,1));
+      box-shadow: 0 12px 24px rgba(16,24,40,.06);
+      position:relative;
+      overflow:hidden;
+  border-right: 3px solid #5f6a5f;
+    }
+    .kpi::after{
+      content:"";
+      position:absolute; inset:auto -40px -50px auto;
+      width:150px; height:150px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(37,99,235,.18), transparent 60%);
+      pointer-events:none;
+    }
+    .kpi .label{color:var(--muted); font-size:12px}
+    .kpi .val{font-weight:900; font-size:18px; margin-top:3px}
+    .kpi .sub{color:var(--muted); font-size:11px}
+
+    /* Weights */
+    .weightsGrid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+      margin-top:10px;
+      position:relative; z-index:1;
+    }
+    @media (max-width: 1100px){ .weightsGrid{grid-template-columns: repeat(2, 1fr)} }
+    @media (max-width: 700px){ .weightsGrid{grid-template-columns: 1fr} }
+
+    .wItem{
+      border:1px solid rgba(16,24,40,.10);
+      border-radius:18px;
+      background: rgba(255,255,255,.98);
+      box-shadow: 0 12px 26px rgba(16,24,40,.06);
+      padding:12px 12px;
+      display:flex; gap:12px; align-items:flex-start;
+      position:relative;
+      overflow:hidden;
+       border-right: 4px solid green;
+    }
+    .wItem::after{
+      content:"";
+      position:absolute;
+      inset:auto -70px -80px auto;
+      width:220px; height:220px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(109,40,217,.14), transparent 60%);
+      pointer-events:none;
+    }
+    .wIcon{
+      width:38px; height:38px;
+      border-radius:14px;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid rgba(16,24,40,.10);
+      background: rgba(16,24,40,.02);
+      flex:0 0 auto;
+      box-shadow: 0 10px 22px rgba(16,24,40,.06);
+      font-size:18px;
+    }
+    .wTitle{font-weight:900; font-size:15px; margin:0;   color: #07079d;}
+    .wPct{font-weight:900; font-size:16px; margin-top:2px; display:flex; align-items:center; gap:8px}
+    .wSub{margin-top:6px; color:var(--muted); font-size:12px}
+    .chip{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:5px 9px;
+      border-radius:999px;
+      border:1px solid rgba(16,24,40,.10);
+      background: rgba(16,24,40,.02);
+      font-weight:900;
+      font-size:11px;
+      white-space:nowrap;
+    }
+
+    /* Chart */
+    .chartBox{
+      border:1px solid rgba(16,24,40,.10);
+      background: rgba(255,255,255,.98);
+      border-radius:18px;
+      padding:10px 10px;
+      box-shadow: 0 12px 26px rgba(16,24,40,.06);
+      position:relative; z-index:1;
+    }
+    .chartBox::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(700px 260px at 25% 0%, rgba(6,182,212,.10), transparent 60%),
+        radial-gradient(700px 260px at 80% 0%, rgba(37,99,235,.10), transparent 60%);
+      pointer-events:none;
+    }
+    .chartWrapWide{ height: 520px; }
+    @media (max-width: 900px){ .chartWrapWide{height: 560px} }
+
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:16px;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+
+    table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:16px}
+    thead th{
+      text-align:right;
+      font-size:12px;
+      color:var(--muted);
+      background: rgba(16,24,40,.04);
+      border-bottom:1px solid rgba(16,24,40,.10);
+      padding:10px 10px;
+    }
+    tbody td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(16,24,40,.10);
+      font-size:13px;
+      vertical-align:top;
+      background: rgba(255,255,255,.98);
+    }
+    tbody tr:hover td{background: rgba(37,99,235,.04)}
+    .rank{font-weight:900; color:var(--a2)}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px; font-size:12px; font-weight:900;
+      border:1px solid rgba(16,24,40,.10);
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 10px 18px rgba(16,24,40,.05);
+      white-space:nowrap;
+    }
+    .pill.good{color: var(--good)}
+    .pill.warn{color: var(--warn)}
+    .pill.bad{color: var(--bad)}
+    .score{font-weight:900}
+
+    /* Province cards: 3 per row */
+    .provGrid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      position:relative; z-index:1
+    }
+    @media (max-width: 1200px){ .provGrid{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width: 760px){ .provGrid{grid-template-columns:1fr} }
+
+    .provCard{
+      border:1px solid rgba(16,24,40,.10);
+      background: rgba(255,255,255,.98);
+      border-radius:22px;
+      padding:12px 12px;
+      box-shadow: 0 16px 32px rgba(16,24,40,.08);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      position:relative;
+      overflow:hidden;
+      border-right:5px solid rgba(109,40,217,.75);
+    }
+    .provCard:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 22px 50px rgba(16,24,40,.14);
+      border-color: rgba(109,40,217,.22);
+    }
+    .provCard::after{
+      content:"";
+      position:absolute; inset:auto -70px -80px auto;
+      width:220px; height:220px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(109,40,217,.14), transparent 60%);
+      pointer-events:none;
+    }
+    .provHead{display:flex; gap:10px; align-items:center; justify-content:space-between}
+    .provLeft{display:flex; gap:10px; align-items:center; min-width:0}
+    .provIcon{
+      width:60px; height:60px; border-radius:14px;
+      background: rgba(16,24,40,.04);
+      border:1px solid rgba(16,24,40,.10);
+      object-fit:contain;
+      flex:0 0 auto;
+    }
+    .provName{font-weight:bold; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;  color: #4f3adf;}
+    .provMeta{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+
+    details{margin-top:10px}
+    summary{
+      cursor:pointer;
+      list-style:none;
+      user-select:none;
+      color:var(--muted);
+      font-weight:900;
+      font-size:12px;
+      display:flex; align-items:center; justify-content:space-between;
+      border:1px dashed rgba(16,24,40,.22);
+      padding:8px 10px;
+      border-radius:14px;
+      background: rgba(16,24,40,.02);
+    }
+    summary::-webkit-details-marker{display:none}
+    .lines{margin-top:10px; display:grid; gap:8px}
+    .lineItem{
+      padding:10px 10px;
+      border-radius:14px;
+      border:1px solid rgba(16,24,40,.10);
+      background: rgba(16,24,40,.02);
+      font-size:13px;
+    }
+    .lineItem b{display:block; margin-bottom:4px}
+
+    .note{
+      margin-top:10px;
+      padding:12px 12px;
+      border-radius:18px;
+      border:1px solid rgba(16,24,40,.10);
+      background: rgba(16,24,40,.02);
+      position:relative; z-index:1;
+    }
+    footer{margin-top:16px; color:var(--muted); font-size:12px; position:relative; z-index:1}
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <section class="banner">
+      <div class="bannerTop">
+        <div class="bannerTitle">
+          <h1>گزارش مدیریتی عملکرد ۹ ماهه بودجه ۱۴۰۴ استان‌ها - (تحلیل  AI)</h1>
+          <div class="subtitle">تحلیل - وزن دهی - تخصیص امتیاز به کمک هوش مصنوعی</div>
+        </div>
+
+        <div class="statusRow" id="statusRow">
+          <div class="statusBtn"><span class="dot good"></span> سطح مطلوب: <b id="cntGood">5</b> استان</div>
+          <div class="statusBtn"><span class="dot warn"></span> سطح میانی: <b id="cntWarn">11</b> استان</div>
+          <div class="statusBtn"><span class="dot bad"></span> نیازمند بهبود: <b id="cntBad">15</b> استان</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Weights -->
+    <div class="card accent purple" style="margin-top:16px">
+      <div class="spark"></div>
+      <div class="cardHeader">
+        <h2>🎯 وزن‌دهی و نحوه امتیازدهی (۱۰۰٪)</h2>
+        <div class="hint">برای شفافیت مدیریتی، مبنای مقایسه و رتبه‌بندی در این بخش نمایش داده شده است.</div>
+      </div>
+
+      <div class="weightsGrid">
+        <div class="wItem"><div class="wIcon">💵</div>
+          <div>
+            <div class="wTitle">منابع (نقدی/غیرنقدی)</div>
+            <div class="wPct"><span class="chip">۲۰٪</span> <span style="color:var(--muted); font-size:12px">وزن کل</span></div>
+            <div class="wSub"><span class="chip">نقدی ۱۳٪</span><span class="chip">غیرنقدی ۷٪</span></div>
+          </div>
+        </div>
+        <div class="wItem"><div class="wIcon">🏡</div>
+          <div>
+            <div class="wTitle">روستایی (بانک)</div>
+            <div class="wPct"><span class="chip">۲۰٪</span> <span style="color:var(--muted); font-size:12px">وزن کل</span></div>
+            <div class="wSub"><span class="chip">معرفی به بانک ۱۰٪</span><span class="chip">انعقاد قرارداد ۱۰٪</span></div>
+          </div>
+        </div>
+        <div class="wItem"><div class="wIcon">🏙️</div>
+          <div>
+            <div class="wTitle">محرومین شهری (پیشرفت)</div>
+            <div class="wPct"><span class="chip">۸٪</span> <span style="color:var(--muted); font-size:12px">وزن کل</span></div>
+            <div class="wSub"><span class="chip">انتقالی ۴٪</span><span class="chip">جدید ۴٪</span></div>
+          </div>
+        </div>
+        <div class="wItem"><div class="wIcon">🗺️</div>
+          <div>
+            <div class="wTitle">طرح هادی (رقومی‌سازی)</div>
+            <div class="wPct"><span class="chip">۱۰٪</span> <span style="color:var(--muted); font-size:12px">وزن کل</span></div>
+            <div class="wSub">تمرکز بر پوشش روستاها و خروجی‌های قابل سنجش</div>
+          </div>
+        </div>
+        <div class="wItem"><div class="wIcon">🌱</div>
+          <div>
+            <div class="wTitle">زمین (جوانی جمعیت / ۹۹ ساله)</div>
+            <div class="wPct"><span class="chip">۸٪</span> <span style="color:var(--muted); font-size:12px">وزن کل</span></div>
+            <div class="wSub"><span class="chip">جوانی جمعیت ۴٪</span><span class="chip">۹۹ ساله ۴٪</span></div>
+          </div>
+        </div>
+        <div class="wItem"><div class="wIcon">🏗️</div>
+          <div>
+            <div class="wTitle">نهضت ملی (اتمام و واگذاری)</div>
+            <div class="wPct"><span class="chip">۱۰٪</span> <span style="color:var(--muted); font-size:12px">وزن کل</span></div>
+            <div class="wSub">تمرکز بر خروجی نهایی و تحویل‌پذیر</div>
+          </div>
+        </div>
+        <div class="wItem"><div class="wIcon">🏢</div>
+          <div>
+            <div class="wTitle">مسکن شهری (پیشرفت / اتمام و واگذاری)</div>
+            <div class="wPct"><span class="chip">۸٪</span> <span style="color:var(--muted); font-size:12px">وزن کل</span></div>
+            <div class="wSub"><span class="chip">پیشرفت ۴٪</span><span class="chip">اتمام و واگذاری ۴٪</span></div>
+          </div>
+        </div>
+        <div class="wItem"><div class="wIcon">🚜</div>
+          <div>
+            <div class="wTitle">ماشین‌آلات (سود)</div>
+            <div class="wPct"><span class="chip">۸٪</span> <span style="color:var(--muted); font-size:12px">وزن کل</span></div>
+            <div class="wSub"><span class="chip">سود به درآمد ۴٪</span><span class="chip">سود به سرمایه ۴٪</span></div>
+          </div>
+        </div>
+        <div class="wItem"><div class="wIcon">📊</div>
+          <div>
+            <div class="wTitle">مالی (نرخ بازده / اعتبار استانی)</div>
+            <div class="wPct"><span class="chip">۸٪</span> <span style="color:var(--muted); font-size:12px">وزن کل</span></div>
+            <div class="wSub"><span class="chip">نرخ بازده ۴٪</span><span class="chip">اعتبار استانی ۴٪</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card accent cyan" style="margin-top:16px">
+      <div class="spark"></div>
+      <div class="cardHeader">
+        <h2>📈 توزیع امتیاز ترکیبی استان‌ها (همه ۳۱ استان)</h2>
+        <div class="hint">فاصله اعداد عمودی از ستون‌ها بیشتر شده تا تداخل رخ ندهد.</div>
+      </div>
+      <div class="chartBox">
+        <div class="chartWrapWide"><canvas id="barScores"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card accent blue">
+        <div class="spark"></div>
+        <h2>🔎 جمع‌بندی مدیریتی کلان</h2>
+        <div class="hint">تصویر کلی کشور، سطح‌بندی استان‌ها و نکات مداخله‌ای.</div>
+        <div class="kpis" id="kpis"></div>
+        <div class="hr"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; position:relative; z-index:1">
+          <div class="note" id="top5"></div>
+          <div class="note" id="bottom5"></div>
+        </div>
+      </div>
+
+      <div class="card accent green">
+        <div class="spark"></div>
+        <h2>🧭 توزیع سطح عملکرد</h2>
+        <div class="hint">بر اساس برچسب سطح عملکرد (عالی/بسیار خوب/متوسط/ضعیف).</div>
+        <div class="chartBox" style="margin-top:10px">
+          <div style="height:300px"><canvas id="pieLevels"></canvas></div>
+        </div>
+        <div class="note">
+          <b>سه محور کلیدی پیشنهادی:</b>
+          <ol style="margin:8px 0 0 0; padding-right:18px">
+            <li>کاهش فاصله «معرفی به بانک» تا «انعقاد قرارداد»</li>
+            <li>تسریع «اتمام و واگذاری» پروژه‌های نزدیک بهره‌برداری</li>
+            <li>تقویت حکمرانی زمین در استان‌های کم‌تحرک</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="card accent amber" style="margin-top:16px">
+      <div class="spark"></div>
+      <h2>🧩 تحلیل استانی (نقاط قوت/ضعف/پیشنهاد)</h2>
+      <div class="hint">در دسکتاپ: ۳ کارت در هر سطر.</div>
+      <div class="provGrid" id="provGrid" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card accent rose" style="margin-top:16px">
+      <div class="spark"></div>
+      <h2>📊 جدول مدیریتی جمع‌بندی عملکرد استان‌ها</h2>
+      <div class="hint">کل جدول کامل نمایش داده می‌شود.</div>
+      <div style="margin-top:10px">
+        <table id="summaryTable">
+          <thead>
+            <tr>
+              <th>رتبه</th>
+              <th>استان</th>
+              <th>امتیاز</th>
+              <th>سطح</th>
+              <th>جمع‌بندی مدیریتی کوتاه</th>
+              <th>اولویت اقدام</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <footer>نسخه HTML مدیریتی — گرافیک ارتقا یافته (Accent Border + Spark + سایه پویا).</footer>
+    </div>
+
+  </div>
+
+<script>
+const iconMap = {
+  "آذربایجان شرقی":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Azsharghi.png",
+  "آذربایجان غربی":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Azgharbi.png",
+  "اردبیل":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Ardabil.png",
+  "اصفهان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Isfahan.png",
+  "البرز":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Alborz.png",
+  "ایلام":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Ilam.png",
+  "بوشهر":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Bushehr.png",
+  "تهران":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Tehran.png",
+  "چهارمحال و بختیاری":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/CHB.png",
+  "خراسان جنوبی":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/SKH.png",
+  "خراسان رضوی":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/RKH.png",
+  "خراسان شمالی":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/NKH.png",
+  "خوزستان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Khuzestan.png",
+  "زنجان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Zanjan.png",
+  "سمنان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Semnan.png",
+  "سیستان و بلوچستان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/SB.png",
+  "فارس":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Fars.png",
+  "قزوین":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Qazvin.png",
+  "قم":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Qom.png",
+  "کردستان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Kordestan.png",
+  "کرمان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Kerman.png",
+  "کرمانشاه":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Kermanshah.png",
+  "کهگیلویه و بویراحمد":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/KB.png",
+  "گلستان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Gilan.png",
+  "گیلان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Golestan.png",
+  "لرستان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Lorestan.png",
+  "مازندران":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Mazandaran.png",
+  "مرکزی":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Markazi.png",
+  "هرمزگان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Hormozgan.png",
+  "همدان":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Hamedan.png",
+  "یزد":"https://bonyadmaskan.github.io/Provinces/Provinces_icon/Yazd.png"
+};
+
+const provinces = [
+  {rank:1,name:"خراسان جنوبی",score:61.91,level:"عالی",summary:"پیشرو در منابع و پیشرفت شهری؛ عملکرد متوازن",priority:"تثبیت و انتقال تجربه",
+   strength:"تجهیز منابع نقدی بسیار بالا و پیشرفت مطلوب در بخشی از شاخص‌های شهری/اجرایی.",
+   weakness:"نیاز به افزایش سهم خروجی‌های اتمام/واگذاری در برخی محورهای اجرایی.",
+   suggestion:"تثبیت مدل مدیریتی و انتقال تجربه به استان‌های انتهایی؛ تمرکز بر خروجی‌محوری در ماه‌های باقیمانده."
+  },
+  {rank:2,name:"بوشهر",score:46.67,level:"بسیار خوب",summary:"عملکرد پایدار و متوازن در اکثر شاخص‌ها",priority:"افزایش سهم پروژه‌های جدید",
+   strength:"پیشرفت بسیار خوب پروژه‌های جدید و جایگاه مناسب در چند محور عملیاتی.",
+   weakness:"ظرفیت ارتقای خروجی نهایی در برخی برنامه‌ها.",
+   suggestion:"تقویت خط تولید پروژه‌های جدید و مدیریت زمان‌بندی برای تبدیل پیشرفت به واگذاری."
+  },
+  {rank:3,name:"کرمانشاه",score:42.66,level:"بسیار خوب",summary:"پیشرفت شهری قوی؛ رتبه ترکیبی بالا",priority:"هم‌راستاسازی مالی و عملیاتی",
+   strength:"پیشرفت پروژه‌های شهری (خصوصاً انتقالی) و جایگاه خوب در شاخص‌های ترکیبی.",
+   weakness:"در برخی شاخص‌های مالی/بهره‌وری ظرفیت بهبود وجود دارد.",
+   suggestion:"تعریف اهداف مالی-عملیاتی مشترک و پایش ماهانه برای افزایش بهره‌وری."
+  },
+  {rank:4,name:"گلستان",score:38.19,level:"بسیار خوب",summary:"توازن مناسب؛ ظرفیت افزایش منابع",priority:"تقویت جذب منابع",
+   strength:"عملکرد مناسب در ترکیب شاخص‌های اجرایی و زمین.",
+   weakness:"افزایش تجهیز منابع و تکمیل زنجیره اجرای پروژه‌ها.",
+   suggestion:"تقویت جذب منابع و تمرکز بر خروجی‌های واگذاری در نیمه دوم سال."
+  },
+  {rank:5,name:"یزد",score:37.54,level:"بسیار خوب",summary:"پیشرفت مناسب پروژه‌ها و مدیریت مالی",priority:"تسریع اتمام و واگذاری",
+   strength:"شاخص‌های مالی/اعتبار و برخی پیشرفت‌ها در سطح مطلوب.",
+   weakness:"خروجی واگذاری قابل افزایش است.",
+   suggestion:"اولویت‌دهی به پروژه‌های نزدیک بهره‌برداری و مدیریت ریسک‌های اجرایی."
+  },
+  {rank:6,name:"سیستان و بلوچستان",score:37.46,level:"خوب",summary:"تحرک در زمین و روستایی",priority:"تقویت شاخص‌های مالی",
+   strength:"تحرک مناسب در برخی محورهای زمین/عملیات روستایی.",
+   weakness:"نیاز به تقویت بهره‌وری مالی و افزایش تبدیل پروژه به خروجی نهایی.",
+   suggestion:"تقویت کنترل مالی پروژه‌ها و برنامه زمان‌بندی فشرده برای اتمام/واگذاری."
+  },
+  {rank:7,name:"مازندران",score:37.45,level:"خوب",summary:"ثبات اجرایی؛ خروجی متوسط",priority:"تمرکز بر پروژه‌های نیمه‌تمام",
+   strength:"ثبات نسبی در اجرای برنامه‌ها و برخی شاخص‌های عملیاتی.",
+   weakness:"خروجی واگذاری و برخی شاخص‌های شهری قابل ارتقاست.",
+   suggestion:"تمرکز بر تکمیل پروژه‌های نیمه‌تمام و افزایش سرعت واگذاری."
+  },
+  {rank:8,name:"خراسان رضوی",score:37.18,level:"خوب",summary:"عملکرد مطلوب شهری و مالی",priority:"تقویت تبدیل معرفی به قرارداد",
+   strength:"عملکرد مطلوب در برخی شاخص‌های شهری/مالی.",
+   weakness:"در برخی محورها نوسان تحقق برنامه دیده می‌شود.",
+   suggestion:"بهبود فرآیندهای بانکی (معرفی→قرارداد) با پیگیری مشترک بانک‌های عامل."
+  },
+  {rank:9,name:"آذربایجان شرقی",score:35.95,level:"خوب",summary:"پیشرفت مناسب شهری",priority:"پایش تحقق برنامه",
+   strength:"جایگاه خوب در بخشی از شاخص‌های شهری و اجرایی.",
+   weakness:"فاصله در برخی خروجی‌های نهایی.",
+   suggestion:"پایش هفتگی تحقق برنامه و تمرکز بر پروژه‌های اثرگذار."
+  },
+  {rank:10,name:"قم",score:34.44,level:"خوب",summary:"شاخص‌های مالی قوی",priority:"افزایش حجم عملیاتی",
+   strength:"در شاخص‌های مالی/نقدشوندگی و غیرنقدی برجسته است.",
+   weakness:"حجم عملیاتی برخی بخش‌ها محدود است.",
+   suggestion:"افزایش پروژه‌های جدید و هدف‌گذاری برای خروجی‌های اتمام/واگذاری."
+  },
+  {rank:11,name:"آذربایجان غربی",score:32.22,level:"متوسط رو به خوب",summary:"عملکرد مناسب روستایی",priority:"تسریع واگذاری",
+   strength:"تحقق مناسب در برخی شاخص‌های روستایی و پیشرفت.",
+   weakness:"در واگذاری/اتمام برخی بخش‌ها عقب‌تر است.",
+   suggestion:"رفع گلوگاه‌های اجرایی-بانکی با کارگروه استانی و حرکت به سمت خروجی نهایی."
+  },
+  {rank:12,name:"خراسان شمالی",score:31.92,level:"متوسط",summary:"تحقق نسبی برنامه",priority:"افزایش خروجی واگذاری",
+   strength:"نسبت تحقق مناسب در برخی بخش‌ها.",
+   weakness:"خروجی واگذاری شهری/نهضت قابل ارتقاست.",
+   suggestion:"تمرکز روی پروژه‌های نزدیک بهره‌برداری و پایش ماهانه."
+  },
+  {rank:13,name:"اصفهان",score:31.60,level:"متوسط",summary:"حجم فعالیت بالا؛ فاصله در تحقق کامل",priority:"اولویت‌بندی پروژه‌ها",
+   strength:"ظرفیت اجرایی بالا و نقش مهم در برخی شاخص‌ها.",
+   weakness:"فاصله برنامه تا عملکرد در بخشی از خروجی‌ها.",
+   suggestion:"اولویت‌بندی پروژه‌های نیمه‌تمام و افزایش نرخ تبدیل پیشرفت به واگذاری."
+  },
+  {rank:14,name:"خوزستان",score:31.40,level:"متوسط",summary:"ظرفیت بالا؛ نوسان عملکرد",priority:"کنترل پیشرفت ماهانه",
+   strength:"پتانسیل اجرایی بالا و حجم فعالیت قابل توجه.",
+   weakness:"نوسان در تحقق برنامه و خروجی‌های نهایی.",
+   suggestion:"استقرار کنترل پیشرفت ماهانه و مدیریت ریسک‌های اجرایی."
+  },
+  {rank:15,name:"همدان",score:29.52,level:"متوسط",summary:"ثبات مالی؛ خروجی محدود",priority:"افزایش سرعت پروژه شهری",
+   strength:"برخی شاخص‌های مالی و بهره‌وری مناسب.",
+   weakness:"خروجی عملیاتی/واگذاری محدودتر از ظرفیت.",
+   suggestion:"تمرکز بر پروژه‌های اثرگذار و زمان‌بندی فشرده برای واگذاری."
+  },
+  {rank:16,name:"کردستان",score:29.28,level:"متوسط",summary:"ظرفیت زمین مناسب",priority:"تمرکز بر اتمام پروژه",
+   strength:"در برخی شاخص‌های زمین/پیشرفت وضعیت قابل قبول دارد.",
+   weakness:"در خروجی اتمام/واگذاری عقب‌تر است.",
+   suggestion:"تعریف برنامه ضربتی اتمام پروژه‌ها و پایش هفتگی."
+  },
+  {rank:17,name:"اردبیل",score:29.05,level:"متوسط",summary:"مدیریت مالی قابل قبول",priority:"افزایش بهره‌برداری نهایی",
+   strength:"در برخی شاخص‌های مالی و غیرنقدی قابل توجه است.",
+   weakness:"خروجی واگذاری شهری پایین‌تر.",
+   suggestion:"تمرکز بر اتمام پروژه‌های نزدیک بهره‌برداری و رفع گلوگاه‌های اجرایی."
+  },
+  {rank:18,name:"فارس",score:28.46,level:"متوسط",summary:"ظرفیت بالا؛ تحقق کمتر از انتظار",priority:"بازمهندسی اولویت‌ها",
+   strength:"ظرفیت فعالیت بالا (روستایی/شهری).",
+   weakness:"تحقق برخی برنامه‌ها پایین‌تر از ظرفیت استان.",
+   suggestion:"بازمهندسی اولویت‌ها، تمرکز بر پروژه‌های زودبازده و بهبود پیگیری بانکی."
+  },
+  {rank:19,name:"کهگیلویه و بویراحمد",score:27.62,level:"متوسط رو به پایین",summary:"تحرک روستایی محدود",priority:"نظارت مدیریتی مستقیم",
+   strength:"برخی تحرکات در بخش روستایی/پیشرفت قابل مشاهده است.",
+   weakness:"ضعف در خروجی نهایی و شاخص‌های مالی/واگذاری.",
+   suggestion:"حضور مدیریتی پررنگ‌تر، هدف‌گذاری کوتاه‌مدت و گزارش هفتگی."
+  },
+  {rank:20,name:"لرستان",score:27.19,level:"متوسط رو به پایین",summary:"پیشرفت روستایی؛ ضعف شهری",priority:"تقویت تیم شهری",
+   strength:"در برخی محورهای روستایی وضعیت قابل قبول دارد.",
+   weakness:"در شاخص‌های شهری و خروجی واگذاری ضعیف‌تر.",
+   suggestion:"تقویت تیم پروژه‌های شهری و برنامه اتمام پروژه‌های نیمه‌تمام."
+  },
+  {rank:21,name:"هرمزگان",score:24.58,level:"متوسط رو به پایین",summary:"ظرفیت زمین؛ تحقق پایین‌تر از هدف",priority:"پایش ماهانه شاخص‌ها",
+   strength:"ظرفیت زمین و برخی شاخص‌های اجرایی.",
+   weakness:"تحقق برنامه/خروجی نهایی در چند محور پایین‌تر.",
+   suggestion:"پایش ماهانه با اهداف عددی مشخص در واگذاری و اتمام پروژه‌ها."
+  },
+  {rank:22,name:"ایلام",score:24.46,level:"پایین",summary:"خروجی نهایی محدود",priority:"پروژه‌های سریع‌الاثر",
+   strength:"در برخی شاخص‌ها (محدود) عملکرد قابل قبول.",
+   weakness:"خروجی‌های نهایی کم و پراکندگی در تحقق برنامه.",
+   suggestion:"تمرکز بر پروژه‌های کم‌هزینه با بازده سریع و کنترل هفتگی."
+  },
+  {rank:23,name:"زنجان",score:24.15,level:"پایین",summary:"ثبات محدود اجرایی",priority:"برنامه فشرده ۳ ماهه",
+   strength:"وجود ظرفیت‌های اجرایی در برخی بخش‌ها.",
+   weakness:"فاصله در تحقق برنامه و خروجی واگذاری.",
+   suggestion:"برنامه فشرده ۳ ماهه با اهداف روشن و گزارش‌دهی منظم."
+  },
+  {rank:24,name:"کرمان",score:22.83,level:"پایین",summary:"فاصله منابع تا خروجی",priority:"بازنگری مدیریت پروژه",
+   strength:"پتانسیل اجرایی قابل توجه.",
+   weakness:"خروجی نهایی کمتر از ظرفیت و نیاز به مدیریت اولویت‌ها.",
+   suggestion:"بازنگری سبد پروژه‌ها و تمرکز روی پروژه‌های نزدیک بهره‌برداری."
+  },
+  {rank:25,name:"سمنان",score:22.50,level:"پایین",summary:"ساختار منظم؛ خروجی کم",priority:"تمرکز بر واگذاری نهایی",
+   strength:"نظم اجرایی.",
+   weakness:"خروجی پایین نسبت به برنامه.",
+   suggestion:"تمرکز بر واگذاری نهایی و کاهش زمان چرخه تکمیل پروژه."
+  },
+  {rank:26,name:"قزوین",score:20.67,level:"پایین",summary:"ضعف عملیاتی محسوس",priority:"تعیین هدف کمی مشخص",
+   strength:"برخی شاخص‌های محدود قابل اتکا.",
+   weakness:"عملکرد عملیاتی پایین در مجموعه شاخص‌ها.",
+   suggestion:"تعیین اهداف کمی کوتاه‌مدت و پیگیری هفتگی در مرکز."
+  },
+  {rank:27,name:"چهارمحال و بختیاری",score:20.08,level:"پایین",summary:"تحقق پایین برنامه",priority:"تکمیل پروژه‌های کوچک",
+   strength:"پروژه‌های کوچک قابل مدیریت.",
+   weakness:"تحقق پایین در چند محور و خروجی کم.",
+   suggestion:"تکمیل پروژه‌های کوچک زودبازده و تمرکز روی خروجی قابل ارائه."
+  },
+  {rank:28,name:"مرکزی",score:20.02,level:"پایین",summary:"ضعف در واگذاری شهری",priority:"بازنگری اولویت‌ها",
+   strength:"ظرفیت اجرایی وجود دارد.",
+   weakness:"ضعف در خروجی واگذاری و پیشرفت شهری در داده‌های حاضر.",
+   suggestion:"بازنگری اولویت‌ها و تمرکز بر پروژه‌های اثرگذار کوتاه‌مدت."
+  },
+  {rank:29,name:"تهران",score:17.91,level:"ضعیف",summary:"ظرفیت بالا؛ خروجی کمتر از انتظار",priority:"تمرکز مستقیم مدیریتی",
+   strength:"ظرفیت مدیریتی/مالی بالقوه بالا.",
+   weakness:"خروجی عملیاتی کمتر از ظرفیت در داده‌های حاضر.",
+   suggestion:"تعیین اهداف خروجی‌محور و پایش مستقیم مدیریتی با گزارش‌های دوره‌ای."
+  },
+  {rank:30,name:"گیلان",score:17.17,level:"ضعیف",summary:"اتمام/واگذاری پایین",priority:"مداخله ۶۰ روزه",
+   strength:"ظرفیت بالقوه در برخی محورها.",
+   weakness:"ضعف محسوس در خروجی اتمام و واگذاری.",
+   suggestion:"مداخله ۶۰ روزه با تمرکز بر پروژه‌های متوقف و گزارش هفتگی."
+  },
+  {rank:31,name:"البرز",score:14.91,level:"بسیار ضعیف",summary:"پایین‌ترین امتیاز ترکیبی",priority:"مداخله فوری و گزارش هفتگی",
+   strength:"ظرفیت توسعه شهری.",
+   weakness:"ضعف در چند شاخص کلیدی و خروجی پایین.",
+   suggestion:"مداخله فوری، تعیین اهداف عددی کوتاه‌مدت و گزارش هفتگی به ستاد."
+  }
+];
+
+function levelClass(level){
+  if(level === "عالی" || level === "بسیار خوب") return "good";
+  if(level.includes("متوسط")) return "warn";
+  return "bad";
+}
+function rowMini(p){
+  const cls = levelClass(p.level);
+  const icon = iconMap[p.name] || "";
+  return `
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid rgba(16,24,40,.08)">
+      <div style="display:flex; align-items:center; gap:10px; min-width:0">
+        <img class="provIcon" src="${icon}" alt="${p.name}">
+        <div style="min-width:0">
+          <div style="font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${p.name}</div>
+          <div style="color:var(--muted); font-size:12px">رتبه ${p.rank}</div>
+        </div>
+      </div>
+      <div class="pill ${cls}">امتیاز ${p.score.toFixed(2)}</div>
+    </div>
+  `;
+}
+
+function renderBadgesAndKpis(){
+  document.getElementById("cntGood").textContent = "5";
+  document.getElementById("cntWarn").textContent = "11";
+  document.getElementById("cntBad").textContent  = "15";
+
+  const top = provinces.slice().sort((a,b)=>b.score-a.score)[0];
+  const avg = provinces.reduce((s,p)=>s+p.score,0)/provinces.length;
+  const min = provinces.slice().sort((a,b)=>a.score-b.score)[0];
+
+  document.getElementById("kpis").innerHTML = `
+    <div class="kpi"><div class="label">استان اول</div><div class="val">${top.name}</div><div class="sub">امتیاز: ${top.score.toFixed(2)}</div></div>
+    <div class="kpi"><div class="label">میانگین کشور (در این داده)</div><div class="val">${avg.toFixed(2)}</div><div class="sub">مبنای مقایسه داخلی</div></div>
+    <div class="kpi"><div class="label">استان آخر</div><div class="val">${min.name}</div><div class="sub">امتیاز: ${min.score.toFixed(2)}</div></div>
+    <div class="kpi"><div class="label">تعداد استان‌ها</div><div class="val">${provinces.length}</div><div class="sub">پوشش کامل</div></div>
+  `;
+
+  const top5 = provinces.slice().sort((a,b)=>b.score-a.score).slice(0,5);
+  const bottom5 = provinces.slice().sort((a,b)=>a.score-b.score).slice(0,5);
+
+  document.getElementById("top5").innerHTML = `<b>۵ استان برتر</b><div style="margin-top:8px">${top5.map(rowMini).join("")}</div>`;
+  document.getElementById("bottom5").innerHTML = `<b>۵ استان انتهایی</b><div style="margin-top:8px">${bottom5.map(rowMini).join("")}</div>`;
+}
+
+/* ✅ varied accent color on province cards */
+const accentCycle = ["rgba(109,40,217,.78)","rgba(37,99,235,.78)","rgba(6,182,212,.78)","rgba(34,197,94,.78)","rgba(245,158,11,.82)","rgba(244,63,94,.76)"];
+
+function renderProvinceCards(){
+  const grid = document.getElementById("provGrid");
+  grid.innerHTML = "";
+  provinces.slice().sort((a,b)=>a.rank-b.rank).forEach((p, idx)=>{
+    const cls = levelClass(p.level);
+    const icon = iconMap[p.name] || "";
+    const acc = accentCycle[idx % accentCycle.length];
+    grid.insertAdjacentHTML("beforeend", `
+      <div class="provCard" style="border-right-color:${acc}">
+        <div class="provHead">
+          <div class="provLeft">
+            <img class="provIcon" src="${icon}" alt="${p.name}">
+            <div style="min-width:0">
+              <div class="provName">${p.rank}. ${p.name}</div>
+              <div class="hint" style="margin-top:2px">${p.summary}</div>
+            </div>
+          </div>
+          <div class="provMeta">
+            <span class="pill ${cls}">${p.level}</span>
+            <span class="pill">امتیاز ${p.score.toFixed(2)}</span>
+          </div>
+        </div>
+
+        <details>
+          <summary>
+            <span>نمایش نقاط قوت/ضعف و پیشنهاد بهبود</span>
+            <span style="opacity:.75">▾</span>
+          </summary>
+          <div class="lines">
+            <div class="lineItem"><b>✅ نقاط قوت</b>${p.strength}</div>
+            <div class="lineItem"><b>⚠️ نقاط ضعف</b>${p.weakness}</div>
+            <div class="lineItem"><b>🎯 پیشنهاد بهبود</b>${p.suggestion}</div>
+          </div>
+        </details>
+      </div>
+    `);
+  });
+}
+
+function renderTable(){
+  const tbody = document.querySelector("#summaryTable tbody");
+  tbody.innerHTML = "";
+  provinces.slice().sort((a,b)=>a.rank-b.rank).forEach(p=>{
+    const cls = levelClass(p.level);
+    tbody.insertAdjacentHTML("beforeend", `
+      <tr>
+        <td class="rank">${p.rank}</td>
+        <td>
+          <div style="display:flex; align-items:center; gap:10px">
+            <img class="provIcon" src="${iconMap[p.name] || ""}" alt="${p.name}">
+            <div style="font-weight:900">${p.name}</div>
+          </div>
+        </td>
+        <td class="score">${p.score.toFixed(2)}</td>
+        <td><span class="pill ${cls}">${p.level}</span></td>
+        <td>${p.summary}</td>
+        <td>${p.priority}</td>
+      </tr>
+    `);
+  });
+}
+
+/* Charts */
+let barChart, pieChart;
+
+function buildCharts(){
+  const sorted = provinces.slice().sort((a,b)=>a.rank-b.rank);
+  const labels = sorted.map(p=>p.name);
+  const scores = sorted.map(p=>p.score);
+
+  const ctxBar = document.getElementById("barScores");
+  if(barChart) barChart.destroy();
+
+  const g = ctxBar.getContext("2d").createLinearGradient(0, 0, 0, 520);
+  g.addColorStop(0, "rgba(244,63,94,.78)");
+  g.addColorStop(.45,"rgba(109,40,217,.84)");
+  g.addColorStop(1, "rgba(6,182,212,.78)");
+
+  Chart.register(ChartDataLabels);
+
+  barChart = new Chart(ctxBar, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "امتیاز ترکیبی (از 100)",
+        data: scores,
+        backgroundColor: g,
+        borderColor: "rgba(15,23,42,.10)",
+        borderWidth: 1,
+        borderRadius: 10,
+        barPercentage: 0.72,
+        categoryPercentage: 0.82
+      }]
+    },
+    options: {
+      responsive:true,
+      maintainAspectRatio:false,
+      animation:false,
+      plugins:{
+        legend:{labels:{color:"#0b1220", font:{family:"Vazirmatn", weight:"800"}}},
+        tooltip:{
+          rtl:true,
+          bodyFont:{family:"Vazirmatn"},
+          titleFont:{family:"Vazirmatn"},
+          callbacks:{ label: (ctx)=> ` امتیاز: ${Number(ctx.raw).toFixed(2)}` }
+        },
+        datalabels:{
+          rotation: -90,
+          anchor: "end",
+          align: "end",
+          /* ✅ increase distance from the bar to avoid overlap */
+          offset: 18,           /* was 6 */
+          padding: {top: 2, bottom: 2, left: 2, right: 2},
+          clamp: true,
+          clip: false,
+          color:"rgba(11,18,32,.88)",
+          font:{family:"Vazirmatn", weight:"900", size:11},
+          formatter:(v)=> Number(v).toFixed(2)
+        }
+      },
+      layout:{padding:{top: 26}}, /* ✅ more headroom for labels */
+      scales:{
+        x:{
+          ticks:{
+            color:"rgba(11,18,32,.78)",
+            font:{family:"Vazirmatn", size:11, weight:"700"},
+            maxRotation: 65,
+            minRotation: 65,
+            autoSkip: false
+          },
+          grid:{display:false}
+        },
+        y:{
+          ticks:{color:"rgba(11,18,32,.72)", font:{family:"Vazirmatn", size:12}},
+          grid:{color:"rgba(16,24,40,.10)"},
+          suggestedMin:0,
+          suggestedMax:70
+        }
+      }
+    }
+  });
+
+  const counts = {good:0, warn:0, bad:0};
+  provinces.forEach(p=>counts[(p.level==="عالی"||p.level==="بسیار خوب")?"good":(p.level.includes("متوسط")?"warn":"bad")]++);
+
+  const ctxPie = document.getElementById("pieLevels");
+  if(pieChart) pieChart.destroy();
+
+  pieChart = new Chart(ctxPie, {
+    type:"doughnut",
+    data:{
+      labels:["سطح مطلوب","سطح میانی","نیازمند بهبود"],
+      datasets:[{
+        data:[counts.good, counts.warn, counts.bad],
+        backgroundColor:[
+          "rgba(34,197,94,.80)",
+          "rgba(245,158,11,.80)",
+          "rgba(239,68,68,.78)"
+        ],
+        borderColor:"rgba(255,255,255,.9)",
+        borderWidth:2
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      cutout:"62%",
+      plugins:{
+        legend:{position:"bottom", labels:{color:"#0b1220", font:{family:"Vazirmatn", weight:"800"}}},
+        tooltip:{rtl:true, bodyFont:{family:"Vazirmatn"}, titleFont:{family:"Vazirmatn"}}
+      }
+    }
+  });
+}
+
+/* Init */
+renderBadgesAndKpis();
+renderProvinceCards();
+renderTable();
+buildCharts();
+</script>
+</body>
+</html>
